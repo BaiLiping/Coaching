@@ -7,15 +7,15 @@ from tqdm import tqdm
 
 def moving_average(x, w):
     return np.convolve(x, np.ones(w), 'valid') / w
-episode_number=2500
-evaluation_episode_number=5
-average_over=100
 
+episode_number=3000
+evaluation_episode_number=50
+average_over=100
 length=np.zeros(episode_number)
 measure_length=moving_average(length,average_over)
 
-prohibition_parameter=[0]
-prohibition_position=[0.5,0.6]
+prohibition_parameter=[-1]
+prohibition_position=[0.17,0.19]
 
 reward_record_without=pickle.load(open( "without_record.p", "rb"))
 reward_record_without_average=pickle.load(open( "without_average_record.p", "rb"))
@@ -24,8 +24,6 @@ reward_record=pickle.load(open("record.p", "rb"))
 reward_record_average=pickle.load(open("average_record.p","rb"))
 evaluation_reward_record=pickle.load(open( "evaluation_record.p", "rb"))
 average_without=sum(evaluation_reward_record_without)/evaluation_episode_number
-
-#plot training results
 color_scheme=['magenta','yellowgreen','orange','blue','red','cyan','green']
 x=range(len(measure_length))
 for i in range(len(prohibition_position)):
@@ -39,5 +37,5 @@ for i in range(len(prohibition_position)):
     plt.xlabel('Episode Number', fontsize='large')
     plt.ylabel('Episode Reward', fontsize='large')
     plt.legend(loc='upper left',ncol=1, borderaxespad=0,prop={'size': 10})
-    plt.axhline(y=5500, color='black', linestyle='dotted')
-    plt.savefig('Inverted_Double_Pendulum_with_Boundary_at_%s.png' %prohibition_position[i])
+    plt.axhline(y=800, color='black', linestyle='dotted')
+    plt.savefig('Hopper_with_Boundary_at_%s.png' %prohibition_position[i])
