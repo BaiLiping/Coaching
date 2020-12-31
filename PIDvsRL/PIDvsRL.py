@@ -14,7 +14,7 @@ ip_rl = Agent.load(directory='Inverted_Pendulum_RL', format='numpy')
 internals = ip_rl.initial_internals()
 for i in range(test_episodes):
 	kp=25
-	kd=2.27645649
+	kd=2.3
 	environment = gym.make('InvertedPendulum-v2')
 
 	episode_reward=0
@@ -44,8 +44,8 @@ double_rl_episode_record=[]
 double_rl = Agent.load(directory='Double_RL', format='numpy')
 internals = double_rl.initial_internals()
 for i in range(test_episodes):
-	kp=[-0.54124971, -3.05534616]
-	kd=[-0.47012709, -0.70023993]
+	kp=[-0.5, -3]
+	kd=[-0.47, -0.7]
 	environment_control = gym.make('InvertedDoublePendulum-v2')
 	episode_reward=0
 	states = environment_control.reset()
@@ -76,7 +76,7 @@ hopper_rl = Agent.load(directory='Hopper_RL', format='numpy')
 internals = hopper_rl.initial_internals()
 for i in range(test_episodes):
 	thigh_actuator_kp=[-2,-2,-0.5,-1]
-	thigh_actuator_kd=[-1.6,1, 0.2,-0.4]
+	thigh_actuator_kd=[-1.7,1, 0.2,-0.4]
 	leg_actuator_kp=[-0.4,-0.5,-0.1,-0.2]
 	leg_actuator_kd=[-1,0.2,-1,-0.1]
 	foot_actuator_kp=[-2, 1, 0.5, -1]
@@ -125,24 +125,20 @@ walker_rl_episode_record=[]
 walker_rl = Agent.load(directory='Walker_RL', format='numpy')
 internals = walker_rl.initial_internals()
 for i in range(test_episodes):
-	thigh_actuator_kp=[-3,-2]
-	thigh_actuator_kd=[-2,1]
-	leg_actuator_kp=[-.5,-0.5]
-	leg_actuator_kd=[-.5,0.2]
-	foot_actuator_kp=[-.5, 1]
-	foot_actuator_kd=[-.5,-0.1]
-	left_thigh_actuator_kp=[-3,-2]
-	left_thigh_actuator_kd=[-2,1]
-	left_leg_actuator_kp=[-.5,-0.5]
-	left_leg_actuator_kd=[-.5,0.2]
-	left_foot_actuator_kp=[-0.5, 1]
-	left_foot_actuator_kd=[-0.5,-0.1]
+	thigh_actuator_kp=[7 ]
+	leg_actuator_kp= [5]
+	foot_actuator_kp=[4.5]
+	left_thigh_actuator_kp=[1.7]
+	left_leg_actuator_kp=[5 ]
+	left_foot_actuator_kp=[ -1.48 ]
 	
 	environment = gym.make('Walker2d-v3')
 	episode_reward=0
 	states = environment.reset()
 	terminal=False
 	while not terminal:
+
+		rootz=states[0]
 
 		rooty=states[1]
 		velocity_rooty=states[10]
@@ -165,13 +161,13 @@ for i in range(test_episodes):
 		left_foot_angle=states[7]
 		left_foot_angular_velocity=states[16]
 
-		thigh_actions = thigh_actuator_kp[0]*rooty+thigh_actuator_kd[0]*velocity_rooty
-		leg_actions = leg_actuator_kp[0]*rooty+leg_actuator_kd[0]*velocity_rooty
-		foot_actions = foot_actuator_kp[0]*rooty+foot_actuator_kd[0]*velocity_rooty
-		left_thigh_actions = left_thigh_actuator_kp[0]*rooty+left_thigh_actuator_kd[0]*velocity_rooty
-		left_leg_actions = left_leg_actuator_kp[0]*rooty+left_leg_actuator_kd[0]*velocity_rooty
-		left_foot_actions = left_foot_actuator_kp[0]*rooty+left_foot_actuator_kd[0]*velocity_rooty
-		actions=[thigh_actions,leg_actions,foot_actions,left_thigh_actions,left_leg_actions,left_foot_actions]
+		thigh_actions = thigh_actuator_kp[0]*rootz
+		leg_actions = leg_actuator_kp[0]*rootz
+		foot_actions = foot_actuator_kp[0]*rootz
+		left_thigh_actions = left_thigh_actuator_kp[0]*rootz
+		left_leg_actions = left_leg_actuator_kp[0]*rootz
+		left_foot_actions = left_foot_actuator_kp[0]*rootz
+		actions=[thigh_actions,leg_actions,foot_actions,left_thigh_actions,left_leg_actions,left_foot_actions]                                   
 		states, reward, terminal,info = environment.step(actions)
 		episode_reward+=reward
 	walker_pid_episode_record.append(episode_reward)
@@ -195,16 +191,17 @@ pid_record=[]
 rl_record=[]
 
 pid_record.append(int(np.sum(ip_pid_episode_record)/test_episodes))
-pid_record.append(int(np.sum(double_pid_episode_record)/test_episodes*0.1))
+pid_record.append(int(np.sum(double_pid_episode_record)/test_episodes))
 pid_record.append(int(np.sum(hopper_pid_episode_record)/test_episodes))
 pid_record.append(int(np.sum(walker_pid_episode_record)/test_episodes))
 
 rl_record.append(int(np.sum(ip_rl_episode_record)/test_episodes))
-rl_record.append(int(np.sum(double_rl_episode_record)/test_episodes*0.1))
+rl_record.append(int(np.sum(double_rl_episode_record)/test_episodes))
 rl_record.append(int(np.sum(hopper_rl_episode_record)/test_episodes))
 rl_record.append(int(np.sum(walker_rl_episode_record)/test_episodes))
 
-
+print('PID',pid_record)
+print('rl:', rl_record)
 
 
 
@@ -222,7 +219,7 @@ rects2 = ax.bar(x + width/2, rl_record, width, label='RL')
 ax.set_ylabel('Average Score Over 10 Trials')
 ax.set_xticks(x)
 ax.set_xticklabels(labels)
-ax.legend()
+ax.legend(loc='upper left',ncol=1, borderaxespad=0,prop={'size': 11})
 
 def autolabel(rects):
     """Attach a text label above each bar in *rects*, displaying its height."""
@@ -237,7 +234,5 @@ def autolabel(rects):
 
 autolabel(rects1)
 autolabel(rects2)
-
 fig.tight_layout()
-
-plt.savefig('PIDvsRL.png')
+fig.savefig('PIDvsRL.png')
