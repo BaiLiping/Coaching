@@ -158,8 +158,8 @@ reward_record_average=np.zeros((len(prohibition_position),len(prohibition_parame
 reward_record=np.zeros((len(prohibition_position),len(prohibition_parameter),episode_number))
 evaluation_reward_record=np.zeros((len(prohibition_position),len(prohibition_parameter),evaluation_episode_number))
 
-kp=[-0.54124971, -3.05534616]
-kd=[-0.47012709, -0.70023993]
+kp=[-0.5, -3]
+kd=[-0.47, -0.7]
 for k in range(len(prohibition_position)):
     #training
     for i in range(len(prohibition_parameter)):

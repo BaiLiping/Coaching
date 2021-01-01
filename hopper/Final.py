@@ -124,7 +124,7 @@ evaluation_reward_record=np.zeros((len(prohibition_position),len(prohibition_par
 
 
 thigh_actuator_kp=[-2,-2,-0.5,-1]
-thigh_actuator_kd=[-2,1, 0.2,-0.4]
+thigh_actuator_kd=[-1.7,1, 0.2,-0.4]
 leg_actuator_kp=[-0.4,-0.5,-0.1,-0.2]
 leg_actuator_kd=[-1,0.2,-1,-0.1]
 foot_actuator_kp=[-2, 1, 0.5, -1]

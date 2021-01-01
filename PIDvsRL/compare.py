@@ -65,7 +65,7 @@ walker_record_average=moving_average(walker_record,average_over)
 without_average=[ip_without_average,double_without_average,hopper_without_average,walker_without_average]
 coached_average=[ip_record_average,double_record_average,hopper_record_average,walker_record_average]
 
-name=['Inverted_Pendulum','Double_Pendulum','Hopper','Walker']
+name=['ip','double','hopper','walker']
 
 #plot training results
 for i in range(len(name)):
@@ -85,21 +85,6 @@ for i in range(len(name)):
     plt.legend(loc='upper left',ncol=1, borderaxespad=0,prop={'size': 10})
     plt.axhline(y=env_standard, color='black', linestyle='dotted')
     plt.savefig('%s.png' %name[i])
-
-
-fig=plt.figure(figsize=(13,7))
-without_record=moving_average(ip_without,5)
-coached_record=moving_average(ip_record,5)
-env_standard=800
-x=range(len(without_record))
-plt.plot(x,without_record,label='Normal Training',color='black',linestyle='-.')
-plt.plot(x,coached_record,label='With PID Controller as Coach',color='magenta')
-plt.xlabel('Episode Number', fontsize='large')
-plt.ylabel('Episode Reward', fontsize='large')
-plt.legend(loc='upper left',ncol=1, borderaxespad=0,prop={'size': 10})
-plt.axhline(y=env_standard, color='black', linestyle='dotted')
-plt.savefig('Inverted_Pendulum_NO_AVE.png')
-
 
 for k in range(n_groups):
 	for i in range(len(without_average[k])):

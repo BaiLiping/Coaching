@@ -9,12 +9,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import make_pipeline
 
-#kp=[-0.47832891*5,-2.93581233*5]
-#kd=[-0.47017734,-0.70055663]
-#kp=[-0.47832891,-2.93581233]
-#kd=[-0.47017734,-0.70055663]
-kp=[-0.54124971, -3.05534616]
-kd=[-0.47012709, -0.70023993]
+kp=[-0.5, -3]
+kd=[-0.47, -0.7]
 
 # polynomial controller
 environment_control = gym.make('InvertedDoublePendulum-v2')
