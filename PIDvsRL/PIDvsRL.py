@@ -12,10 +12,13 @@ ip_pid_episode_record=[]
 ip_rl_episode_record=[]
 ip_rl = Agent.load(directory='Inverted_Pendulum_RL', format='numpy')
 internals = ip_rl.initial_internals()
+environment = gym.make('InvertedPendulum-v2')
+environment_rl = Environment.create(environment='gym', level='InvertedPendulum-v2')
+
+kp=25
+kd=2.3
+
 for i in range(test_episodes):
-	kp=25
-	kd=2.3
-	environment = gym.make('InvertedPendulum-v2')
 
 	episode_reward=0
 	states = environment.reset()
@@ -26,7 +29,6 @@ for i in range(test_episodes):
 		episode_reward+=reward
 	ip_pid_episode_record.append(episode_reward)
 
-	environment_rl = Environment.create(environment='gym', level='InvertedPendulum-v2')
 	episode_reward=0
 	states = environment_rl.reset()
 	terminal=False
@@ -43,21 +45,24 @@ double_pid_episode_record=[]
 double_rl_episode_record=[]
 double_rl = Agent.load(directory='Double_RL', format='numpy')
 internals = double_rl.initial_internals()
+environment_control = gym.make('InvertedDoublePendulum-v2')
+environment_rl = Environment.create(environment='gym', level='InvertedDoublePendulum-v2')
+
+kp=[-0.6, -3]
+kd=[-0.47, -0.7]
+
 for i in range(test_episodes):
-	kp=[-0.5, -3]
-	kd=[-0.47, -0.7]
-	environment_control = gym.make('InvertedDoublePendulum-v2')
+
 	episode_reward=0
 	states = environment_control.reset()
 	terminal=False
 	theta_states=[]
 	while not terminal:
-		actions_predict=kp[0]*states[0]+kp[1]*states[2]+kd[0]*states[6]+kd[1]*states[7]
+		actions_predict=kp[0]*states[1]+kp[1]*states[2]+kd[0]*states[6]+kd[1]*states[7]
 		states, reward, terminal,info = environment_control.step(actions_predict)
 		episode_reward+=reward
 	double_pid_episode_record.append(episode_reward)
 
-	environment_rl = Environment.create(environment='gym', level='InvertedDoublePendulum-v2')
 	episode_reward=0
 	states = environment_rl.reset()
 	terminal=False
@@ -74,14 +79,18 @@ hopper_pid_episode_record=[]
 hopper_rl_episode_record=[]
 hopper_rl = Agent.load(directory='Hopper_RL', format='numpy')
 internals = hopper_rl.initial_internals()
+environment = gym.make('Hopper-v3')
+environment_rl = Environment.create(environment='gym', level='Hopper-v3')
+
+thigh_actuator_kp=[-2,-2,-0.5,-1]
+thigh_actuator_kd=[-1.7,1, 0.2,-0.4]
+leg_actuator_kp=[-0.4,-0.5,-0.1,-0.2]
+leg_actuator_kd=[-1,0.2,-1,-0.1]
+foot_actuator_kp=[-2, 1, 0.5, -1]
+foot_actuator_kd=[-0.4,-0.1,-0.1,-0.5]
+
 for i in range(test_episodes):
-	thigh_actuator_kp=[-2,-2,-0.5,-1]
-	thigh_actuator_kd=[-1.7,1, 0.2,-0.4]
-	leg_actuator_kp=[-0.4,-0.5,-0.1,-0.2]
-	leg_actuator_kd=[-1,0.2,-1,-0.1]
-	foot_actuator_kp=[-2, 1, 0.5, -1]
-	foot_actuator_kd=[-0.4,-0.1,-0.1,-0.5]
-	environment = gym.make('Hopper-v3')
+
 	episode_reward=0
 	states = environment.reset()
 	terminal=False
@@ -107,7 +116,6 @@ for i in range(test_episodes):
 		episode_reward+=reward
 	hopper_pid_episode_record.append(episode_reward)
 
-	environment_rl = Environment.create(environment='gym', level='Hopper-v3')
 	episode_reward=0
 	states = environment_rl.reset()
 	terminal=False
@@ -124,21 +132,24 @@ walker_pid_episode_record=[]
 walker_rl_episode_record=[]
 walker_rl = Agent.load(directory='Walker_RL', format='numpy')
 internals = walker_rl.initial_internals()
-for i in range(test_episodes):
-	thigh_actuator_kp=[7 ]
-	leg_actuator_kp= [5]
-	foot_actuator_kp=[4.5]
-	left_thigh_actuator_kp=[1.7]
-	left_leg_actuator_kp=[5 ]
-	left_foot_actuator_kp=[ -1.48 ]
+environment_rl = Environment.create(environment='gym', level='Walker2d-v3')
+environment = gym.make('Walker2d-v3')
+thigh_actuator_kp=[7 ,0 ]
+leg_actuator_kp= [5, 0]
+foot_actuator_kp=[4.5 , 0]
+left_thigh_actuator_kp=[1.7,0]
+left_leg_actuator_kp=[5 ,0]
+left_foot_actuator_kp=[ -1.48 ,0]
 	
-	environment = gym.make('Walker2d-v3')
+for i in range(test_episodes):
+
 	episode_reward=0
 	states = environment.reset()
 	terminal=False
 	while not terminal:
 
 		rootz=states[0]
+		velocity_rootz=states[9]
 
 		rooty=states[1]
 		velocity_rooty=states[10]
@@ -161,18 +172,17 @@ for i in range(test_episodes):
 		left_foot_angle=states[7]
 		left_foot_angular_velocity=states[16]
 
-		thigh_actions = thigh_actuator_kp[0]*rootz
-		leg_actions = leg_actuator_kp[0]*rootz
-		foot_actions = foot_actuator_kp[0]*rootz
-		left_thigh_actions = left_thigh_actuator_kp[0]*rootz
-		left_leg_actions = left_leg_actuator_kp[0]*rootz
-		left_foot_actions = left_foot_actuator_kp[0]*rootz
+		thigh_actions = thigh_actuator_kp[0]*(1.25-rootz)+thigh_actuator_kp[1]*velocity_rootz
+		leg_actions = leg_actuator_kp[0]*(1.25-rootz)+leg_actuator_kp[1]*velocity_rootz
+		foot_actions = foot_actuator_kp[0]*(1.25-rootz)+foot_actuator_kp[1]*velocity_rootz
+		left_thigh_actions = left_thigh_actuator_kp[0]*(1.25-rootz)+left_thigh_actuator_kp[1]*velocity_rootz
+		left_leg_actions = left_leg_actuator_kp[0]*(1.25-rootz)+left_leg_actuator_kp[1]*velocity_rootz
+		left_foot_actions = left_foot_actuator_kp[0]*(1.25-rootz)+left_foot_actuator_kp[1]*velocity_rootz
 		actions=[thigh_actions,leg_actions,foot_actions,left_thigh_actions,left_leg_actions,left_foot_actions]                                   
 		states, reward, terminal,info = environment.step(actions)
 		episode_reward+=reward
 	walker_pid_episode_record.append(episode_reward)
 
-	environment_rl = Environment.create(environment='gym', level='Walker2d-v3')
 	episode_reward=0
 	states = environment_rl.reset()
 	terminal=False

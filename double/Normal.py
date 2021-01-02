@@ -5,7 +5,6 @@ import math
 import pickle
 from tqdm import tqdm
 
-
 #setparameters
 num_steps=100 #update exploration rate over n steps
 initial_value=0.9 #initial exploartion rate
@@ -71,78 +70,46 @@ environment = Environment.create(
             ]).ravel()
 '''
 
-# Intialize reward record and set parameters
-#define the length of the vector
-
 def moving_average(x, w):
     return np.convolve(x, np.ones(w), 'valid') / w
 
 length=np.zeros(episode_number)
 measure_length=moving_average(length,average_over)
 
-prohibition_parameter=[0]
-prohibition_position=[0.5,0.6]
 
-#compare to agent trained without prohibitive boundary
+if __name__ == "__main__":
+    reward_record_without=[]
 
-#training of agent without prohibitive boundary
-reward_record_without=[]
-
-agent_without = Agent.create(agent='agent.json', environment=environment,exploration=exploration)
-states=environment.reset()
-terminal = False
-angle_record=[]
-print('training agent without boundary')
-for _ in tqdm(range(episode_number)):
-    episode_reward=0
-    states = environment.reset()
-    terminal= False
-    while not terminal:
-        #sintheta1=states[1]
-        #sintheta2=states[2]
-        #theta1=math.asin(sintheta1)
-        #theta2=math.asin(sintheta2)
-        #angle=theta1-theta2
-        #angle_record.append(angle)
-        actions = agent_without.act(states=states)
-        states, terminal, reward = environment.execute(actions=actions)
-        episode_reward+=reward
-        agent_without.observe(terminal=terminal, reward=reward)
-    reward_record_without.append(episode_reward)
-temp=np.array(reward_record_without)
-reward_record_without_average=moving_average(temp,average_over)
-pickle.dump(reward_record_without_average, open( "without_average_record.p", "wb"))
-pickle.dump(reward_record_without, open( "without_record.p", "wb"))
-
-#x_angle=range(len(angle_record))
-#plt.figure(figsize=(30,10))
-#plt.plot(x_angle,angle_record)
-#plt.savefig('angle.png')
-
-#plot
-x=range(len(measure_length))
-plt.figure(figsize=(20,10))
-plt.plot(x,reward_record_without_average,label='without prohibitive boundary',color='black')
-plt.xlabel('episodes')
-plt.ylabel('reward')
-plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc='center left',ncol=2,shadow=True, borderaxespad=0)
-plt.savefig('plot.png')
-
-
-#evaluate the agent without Boundary
-episode_reward = 0.0
-evaluation_reward_record_without=[]
-print('evaluating agent without boundary')
-for _ in tqdm(range(evaluation_episode_number)):
-    episode_reward=0
-    states = environment.reset()
-    internals = agent_without.initial_internals()
+    agent_without = Agent.create(agent='agent.json', environment=environment,exploration=exploration)
+    states=environment.reset()
     terminal = False
-    while not terminal:
-        actions, internals = agent_without.act(
-            states=states, internals=internals, independent=True, deterministic=True
-        )
-        states, terminal, reward = environment.execute(actions=actions)
-        episode_reward += reward
-    evaluation_reward_record_without.append(episode_reward)
-pickle.dump(evaluation_reward_record_without, open( "evaluation_without_record.p", "wb"))
+    print('training agent without boundary')
+    for _ in tqdm(range(episode_number)):
+        episode_reward=0
+        states = environment.reset()
+        terminal= False
+        while not terminal:
+            actions = agent_without.act(states=states)
+            states, terminal, reward = environment.execute(actions=actions)
+            episode_reward+=reward
+            agent_without.observe(terminal=terminal, reward=reward)
+        reward_record_without.append(episode_reward)
+    pickle.dump(reward_record_without, open( "double_without_record.p", "wb"))
+
+    #evaluate the agent without Boundary
+    episode_reward = 0.0
+    evaluation_reward_record_without=[]
+    print('evaluating agent without boundary')
+    for _ in tqdm(range(evaluation_episode_number)):
+        episode_reward=0
+        states = environment.reset()
+        internals = agent_without.initial_internals()
+        terminal = False
+        while not terminal:
+            actions, internals = agent_without.act(
+                states=states, internals=internals, independent=True, deterministic=True
+            )
+            states, terminal, reward = environment.execute(actions=actions)
+            episode_reward += reward
+        evaluation_reward_record_without.append(episode_reward)
+    pickle.dump(evaluation_reward_record_without, open( "double_evaluation_without_record.p", "wb"))

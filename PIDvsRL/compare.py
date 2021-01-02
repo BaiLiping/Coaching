@@ -5,6 +5,7 @@ import math
 import pickle
 from tqdm import tqdm
 import gym
+import statistics 
 
 rl=[]
 pid=[]
@@ -12,89 +13,113 @@ rl_average=[]
 pid_average=[]
 
 
-average_over=20
 
 ip_without=pickle.load(open( "ip_without_record.p", "rb"))
-ip_record_temp=pickle.load(open( "ip_record.p", "rb"))
-ip_record=ip_record_temp[0][0]
+ip_record=pickle.load(open( "ip_record.p", "rb"))
+ip_evaluation_record_without=pickle.load(open( "ip_evaluation_without_record.p", "rb"))
+ip_evaluation_record=pickle.load(open( "ip_evaluation_record.p", "rb"))
+
 double_without=pickle.load(open( "double_without_record.p", "rb"))
-double_record_temp=pickle.load(open( "double_record.p", "rb"))
-double_record=double_record_temp[0][0]
+double_record=pickle.load(open( "double_record.p", "rb"))
+double_evaluation_record_without=pickle.load(open( "double_evaluation_without_record.p", "rb"))
+double_evaluation_record=pickle.load(open( "double_evaluation_record.p", "rb"))
+
 hopper_without=pickle.load(open( "hopper_without_record.p", "rb"))
-hopper_record_temp=pickle.load(open( "hopper_record.p", "rb"))
-hopper_record=hopper_record_temp[0][0]
+hopper_record=pickle.load(open( "hopper_record.p", "rb"))
+hopper_evaluation_record_without=pickle.load(open( "hopper_evaluation_without_record.p", "rb"))
+hopper_evaluation_record=pickle.load(open( "hopper_evaluation_record.p", "rb"))
+
 walker_without=pickle.load(open( "walker_without_record.p", "rb"))
-walker_record_temp=pickle.load(open( "walker_record.p", "rb"))
-walker_record=walker_record_temp[2][0]
+walker_record=pickle.load(open( "walker_record.p", "rb"))[2][0]
+walker_evaluation_record_without=pickle.load(open( "walker_evaluation_without_record.p", "rb"))
+walker_evaluation_record=pickle.load(open( "walker_evaluation_record.p", "rb"))[2][0]
 
 
 n_groups = 4
 standard=[800,5500,800,800]
 without=[ip_without,double_without,hopper_without,walker_without]
 coached=[ip_record,double_record,hopper_record,walker_record]
-
-ip_evaluation_record_without=pickle.load(open( "ip_evaluation_without_record.p", "rb"))
-ip_evaluation_record=pickle.load(open( "ip_evaluation_record.p", "rb"))
-ip_evaluation_record=ip_evaluation_record[0][0]
-double_evaluation_record_without=pickle.load(open( "double_evaluation_without_record.p", "rb"))
-double_evaluation_record=pickle.load(open( "double_evaluation_record.p", "rb"))
-double_evaluation_record=double_evaluation_record[0][0]
-hopper_evaluation_record_without=pickle.load(open( "hopper_evaluation_without_record.p", "rb"))
-hopper_evaluation_record=pickle.load(open( "hopper_evaluation_record.p", "rb"))
-hopper_evaluation_record=hopper_evaluation_record[0][0]
-walker_evaluation_record_without=pickle.load(open( "walker_evaluation_without_record.p", "rb"))
-walker_evaluation_record=pickle.load(open( "walker_evaluation_record.p", "rb"))
-walker_evaluation_record=walker_evaluation_record[2][0]
-
+average_over=[20,100,100,100]
 
 evaluation_without=[ip_evaluation_record_without,double_evaluation_record_without,hopper_evaluation_record_without,walker_evaluation_record_without]
 evaluation=[ip_evaluation_record,double_evaluation_record,hopper_evaluation_record,walker_evaluation_record]
 
 
-def moving_average(x, w):
-    return np.convolve(x, np.ones(w), 'valid') / w
-ip_without_average=moving_average(ip_without,average_over)
-ip_record_average=moving_average(ip_record,average_over)
-double_without_average=moving_average(double_without,average_over)
-double_record_average=moving_average(double_record,average_over)
-hopper_without_average=moving_average(hopper_without,average_over)
-hopper_record_average=moving_average(hopper_record,average_over)
-walker_without_average=moving_average(walker_without,average_over)
-walker_record_average=moving_average(walker_record,average_over)
-
-without_average=[ip_without_average,double_without_average,hopper_without_average,walker_without_average]
-coached_average=[ip_record_average,double_record_average,hopper_record_average,walker_record_average]
-
 name=['ip','double','hopper','walker']
 
+#get bounds
+
+without_ave=[]
+coached_ave=[]
+
+without_sd=[]
+coached_sd=[]
+
+for i in range(len(name)):
+    actual_without_record=without[i]
+    actual_record=coached[i]
+    braket_size=average_over[i]
+    start_point=0
+
+    without_average=[]
+    coached_average=[]
+
+    without_standard_deviation=[]
+    coached_standard_deviation=[]
+
+    for j in range(len(actual_record)-braket_size+1):
+        braket_without=actual_without_record[start_point:start_point+braket_size]
+        without_mean=statistics.mean(braket_without)
+        without_average.append(without_mean)
+        without_standard_deviation.append(statistics.stdev(braket_without, xbar = without_mean))
+
+        braket_coached=actual_record[start_point:start_point+braket_size]
+        coached_mean=statistics.mean(braket_coached)
+        coached_average.append(coached_mean)
+        coached_standard_deviation.append(statistics.stdev(braket_coached, xbar = coached_mean))
+
+        start_point+=1
+
+    without_sd.append(without_standard_deviation)
+    coached_sd.append(coached_standard_deviation)
+    without_ave.append(without_average)
+    coached_ave.append(coached_average)
 #plot training results
 for i in range(len(name)):
     fig=plt.figure(figsize=(13,7))
-    without_record=without_average[i]
-    coached_record=coached_average[i]
+    without_record=np.array(without_ave[i])
+    coached_record=np.array(coached_ave[i])
+    without_standard_deviation=np.array(without_sd[i])
+    coached_standard_deviation=np.array(coached_sd[i])
+
     evalu_without=evaluation_without[i]
     evalu=evaluation[i]
     evalu_without_ave=int(sum(evalu_without)/len(evalu_without))
     evalu_ave=int(sum(evalu)/len(evalu))
+
     env_standard=standard[i]
+
     x=range(len(without_record))
     plt.plot(x,without_record,label='Normal Training\nEvaluation %s'%evalu_without_ave,color='black',linestyle='-.')
-    plt.plot(x,coached_record,label='With PID Controller as Coach\nEvaluation %s'%evalu_ave,color='magenta')
+    plt.fill_between(x, without_record - without_standard_deviation, without_record+without_standard_deviation,color='black',alpha=0.4)
+    plt.plot(x,coached_record,label='Coached by PID Controller\nEvaluation %s'%evalu_ave,color='magenta')
+    plt.fill_between(x, coached_record - coached_standard_deviation, coached_record+coached_standard_deviation,color='magenta',alpha=0.2)
     plt.xlabel('Episode Number', fontsize='large')
     plt.ylabel('Episode Reward', fontsize='large')
-    plt.legend(loc='upper left',ncol=1, borderaxespad=0,prop={'size': 10})
+    plt.legend(loc='upper left',ncol=1, borderaxespad=0,prop={'size': 18})
     plt.axhline(y=env_standard, color='black', linestyle='dotted')
     plt.savefig('%s.png' %name[i])
 
 for k in range(n_groups):
-	for i in range(len(without_average[k])):
-		if without_average[k][i]>=standard[k]:
-			rl_average.append(i+average_over-1)
+	for i in range(len(without_ave[k])):
+		if without_ave[k][i]>=standard[k]:
+			rl_average.append(i+average_over[k]-1)
 			break
+
 for k in range(n_groups):
-	for i in range(len(coached_average[k])):
-		if coached_average[k][i]>=standard[k]:
-			pid_average.append(i+average_over-1)
+	for i in range(len(coached_ave[k])):
+		if coached_ave[k][i]>=standard[k]:
+			pid_average.append(i+average_over[k]-1)
 			break
 
 for k in range(n_groups):
