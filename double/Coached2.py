@@ -28,7 +28,7 @@ for epi in tqdm(range(episode_number)):
     cons_position=0
 
     while not terminal:
-        theta1_old=states[1]
+        theta1_old=states[6]
         count+=1
 
         actions = agent.act(states=states)
@@ -43,8 +43,9 @@ for epi in tqdm(range(episode_number)):
         velocity_theta1=states[6]
         velocity_theta2=states[7]
 
-        if abs(sintheta1)<=0.07:
-            if abs(sintheta1)-abs(theta1_old)>0 and sintheta1*theta1_old>0:
+
+        if abs(velocity_theta1)>=0.1 and abs(velocity_theta1)<=0.4:
+            if abs(velocity_theta1)-abs(theta1_old)>0 and velocity_theta1*theta1_old>0:
                 old_count=consecutive[cons_position]
                 consecutive.append(count)
                 cons_position+=1
@@ -54,15 +55,12 @@ for epi in tqdm(range(episode_number)):
                     positive=1
 
             if positive==2:
-                positive=0
+                print('before:',states[6])
                 intervention=kp[0]*states[1]+kp[1]*states[2]+kd[0]*states[6]+kd[1]*states[7]
                 print('intervention:',intervention)
                 states, terminal, reward = environment.execute(actions=intervention)
-
-        
-
+                print('after:', states[6])
     reward_record.append(episode_reward)
-
 
 #evaluate
 episode_reward = 0.0

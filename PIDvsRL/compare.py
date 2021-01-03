@@ -101,9 +101,9 @@ for i in range(len(name)):
 
     x=range(len(without_record))
     plt.plot(x,without_record,label='Normal Training\nEvaluation %s'%evalu_without_ave,color='black',linestyle='-.')
-    plt.fill_between(x, without_record - without_standard_deviation, without_record+without_standard_deviation,color='black',alpha=0.4)
-    plt.plot(x,coached_record,label='Coached by PID Controller\nEvaluation %s'%evalu_ave,color='magenta')
-    plt.fill_between(x, coached_record - coached_standard_deviation, coached_record+coached_standard_deviation,color='magenta',alpha=0.2)
+    plt.fill_between(x, without_record - without_standard_deviation, without_record+without_standard_deviation,color='gray',alpha=0.3)
+    plt.plot(x,coached_record,label='Coached by PID Controller\nEvaluation %s'%evalu_ave,color='royalblue')
+    plt.fill_between(x, coached_record - coached_standard_deviation, coached_record+coached_standard_deviation,color='royalblue',alpha=0.3)
     plt.xlabel('Episode Number', fontsize='large')
     plt.ylabel('Episode Reward', fontsize='large')
     plt.legend(loc='upper left',ncol=1, borderaxespad=0,prop={'size': 18})

@@ -6,16 +6,12 @@ import pickle
 from tqdm import tqdm
 import gym
 
-#kp=1.77327564e+00
-#kd=-2.60674054e-02
-kp=40
-kd=2.27645649
-#kp=3.02458142 
-#kd=2.50691026
-#kp=1.67000663 
-#kd=-2.27637994
 
-# Pre-defined or custom environment
+kp=15
+kd=2.25
+
+record=[]
+y_record=[]
 environment = gym.make('InvertedPendulum-v2')
 print('testing PID controller')
 episode_reward=0
@@ -25,6 +21,14 @@ while not terminal:
     actions = kp*states[1]+kd*states[3]
     states, reward, terminal,info = environment.step(actions)
     print('velocity: ',states[3])
+    record.append(states[3])
+    y_record.append(states[1])
     print('actions: ',actions)
     episode_reward+=reward
 print(episode_reward)
+
+x=range(len(record))
+plt.plot(x,record)
+plt.show()
+plt.plot(x,y_record)
+plt.show()

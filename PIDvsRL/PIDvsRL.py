@@ -48,8 +48,8 @@ internals = double_rl.initial_internals()
 environment_control = gym.make('InvertedDoublePendulum-v2')
 environment_rl = Environment.create(environment='gym', level='InvertedDoublePendulum-v2')
 
-kp=[-0.6, -3]
-kd=[-0.47, -0.7]
+kp=[-0.5,-2.9]
+kd=[-0.5,-0.6]
 
 for i in range(test_episodes):
 
@@ -134,12 +134,12 @@ walker_rl = Agent.load(directory='Walker_RL', format='numpy')
 internals = walker_rl.initial_internals()
 environment_rl = Environment.create(environment='gym', level='Walker2d-v3')
 environment = gym.make('Walker2d-v3')
-thigh_actuator_kp=[7 ,0 ]
-leg_actuator_kp= [5, 0]
-foot_actuator_kp=[4.5 , 0]
-left_thigh_actuator_kp=[1.7,0]
-left_leg_actuator_kp=[5 ,0]
-left_foot_actuator_kp=[ -1.48 ,0]
+thigh_actuator_kp=[7,-1]
+leg_actuator_kp= [ 5 ,-1.2]
+foot_actuator_kp= [4.5 ,-1]
+left_thigh_actuator_kp= [ 1.7 ,-1.1]
+left_leg_actuator_kp=[5, -1.4]
+left_foot_actuator_kp=[ -1.48, -1.4]
 	
 for i in range(test_episodes):
 
@@ -172,12 +172,12 @@ for i in range(test_episodes):
 		left_foot_angle=states[7]
 		left_foot_angular_velocity=states[16]
 
-		thigh_actions = thigh_actuator_kp[0]*(1.25-rootz)+thigh_actuator_kp[1]*velocity_rootz
-		leg_actions = leg_actuator_kp[0]*(1.25-rootz)+leg_actuator_kp[1]*velocity_rootz
-		foot_actions = foot_actuator_kp[0]*(1.25-rootz)+foot_actuator_kp[1]*velocity_rootz
-		left_thigh_actions = left_thigh_actuator_kp[0]*(1.25-rootz)+left_thigh_actuator_kp[1]*velocity_rootz
-		left_leg_actions = left_leg_actuator_kp[0]*(1.25-rootz)+left_leg_actuator_kp[1]*velocity_rootz
-		left_foot_actions = left_foot_actuator_kp[0]*(1.25-rootz)+left_foot_actuator_kp[1]*velocity_rootz
+		thigh_actions = thigh_actuator_kp[0]*(1.25-rootz)+thigh_actuator_kp[1]*rooty
+		leg_actions = leg_actuator_kp[0]*(1.25-rootz)+leg_actuator_kp[1]*rooty
+		foot_actions = foot_actuator_kp[0]*(1.25-rootz)+foot_actuator_kp[1]*rooty
+		left_thigh_actions = left_thigh_actuator_kp[0]*(1.25-rootz)+left_thigh_actuator_kp[1]*rooty
+		left_leg_actions = left_leg_actuator_kp[0]*(1.25-rootz)+left_leg_actuator_kp[1]*rooty
+		left_foot_actions = left_foot_actuator_kp[0]*(1.25-rootz)+left_foot_actuator_kp[1]*rooty
 		actions=[thigh_actions,leg_actions,foot_actions,left_thigh_actions,left_leg_actions,left_foot_actions]                                   
 		states, reward, terminal,info = environment.step(actions)
 		episode_reward+=reward
