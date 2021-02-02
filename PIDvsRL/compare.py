@@ -36,10 +36,10 @@ walker_evaluation_record=pickle.load(open( "walker_evaluation_record.p", "rb"))[
 
 
 n_groups = 4
-standard=[800,5500,800,800]
+standard=[800,7000,800,800]
 without=[ip_without,double_without,hopper_without,walker_without]
 coached=[ip_record,double_record,hopper_record,walker_record]
-average_over=[20,100,100,100]
+average_over=[20,150,100,100]
 
 evaluation_without=[ip_evaluation_record_without,double_evaluation_record_without,hopper_evaluation_record_without,walker_evaluation_record_without]
 evaluation=[ip_evaluation_record,double_evaluation_record,hopper_evaluation_record,walker_evaluation_record]
@@ -104,9 +104,11 @@ for i in range(len(name)):
     plt.fill_between(x, without_record - without_standard_deviation, without_record+without_standard_deviation,color='gray',alpha=0.3)
     plt.plot(x,coached_record,label='Coached by PID Controller\nEvaluation %s'%evalu_ave,color='royalblue')
     plt.fill_between(x, coached_record - coached_standard_deviation, coached_record+coached_standard_deviation,color='royalblue',alpha=0.3)
-    plt.xlabel('Episode Number', fontsize='large')
-    plt.ylabel('Episode Reward', fontsize='large')
-    plt.legend(loc='upper left',ncol=1, borderaxespad=0,prop={'size': 18})
+    plt.xlabel('Episode Number', fontsize=25)
+    plt.xticks(fontsize=18) 
+    plt.ylabel('Episode Reward', fontsize=25)
+    plt.yticks(fontsize=18)
+    plt.legend(loc='upper left',ncol=1, borderaxespad=0,prop={'size': 20})
     plt.axhline(y=env_standard, color='black', linestyle='dotted')
     plt.savefig('%s.png' %name[i])
 
